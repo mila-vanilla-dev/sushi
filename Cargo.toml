@@ -1,0 +1,34 @@
+[package]
+name = "sushi"
+version = "0.1.0"
+edition = "2024"
+description = "Simple Universal Shopping Interface - Rust Backend"
+license = "MIT"
+
+[lib]
+name = "sushi"
+path = "src/lib.rs"
+
+[dependencies]
+once_cell = "1.21.3"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.142"
+dotenvy = "0.15"
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
+reqwest = { version = "0.12.23", features = ["json"] }
+base64 = "0.22.1"
+clap = { version = "4.0", features = ["derive"] }
+axum = "0.8.4"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tower-http = { version = "0.6.2", features = ["trace"] }
+log = "0.4.27"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.18.0", features = ["v4", "serde"] }
+argon2 = "0.5.3"
+rand = "0.8"
+jsonwebtoken = "9.3.1"
+axum-extra = { version = "0.10.1", features = ["typed-header"] }
+headers = "0.4.1"
+aws-config = { version = "1.8.5", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1.102.0"
