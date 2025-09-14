@@ -39,3 +39,4 @@ Admin only, private:
 */
 // TODO: Implement admin api
 pub mod admin;
+pub mod db;

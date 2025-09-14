@@ -9,6 +9,7 @@ use sushi::{AppState, Result as UpsResult, UpsClient, UpsConfig, endpoints, midd
 use tokio::sync::RwLock;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use sqlx::postgres::PgPoolOptions;
 
 /// SUSHI - UPS Address Validation Tool
 #[derive(Parser, Debug)]
@@ -35,6 +36,15 @@ async fn main() -> UpsResult<()> {
 
     // Load environment variables from .env file
     dotenv().ok();
+
+    let database_url = std::env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set in enviroment");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await
+        .expect("Unable to connect to Postgres");
 
     // Initialize tracing subscriber for structured logging
     tracing_subscriber::registry()
@@ -82,6 +92,7 @@ async fn main() -> UpsResult<()> {
         ups_client: client,
         access_token,
         user_store,
+        db_pool: Some(pool.clone()),
     };
 
     // Startup axum server with tracing middleware
@@ -153,6 +164,7 @@ async fn main() -> UpsResult<()> {
                 )
                 .layer(axum::middleware::from_fn(middleware::admin_middleware)),
         )
+        .route("/db_health", axum::routing::get(endpoints::db::db_health))
         .with_state(app_state)
         .layer(
             TraceLayer::new_for_http()

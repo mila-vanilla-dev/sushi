@@ -25,6 +25,7 @@ pub struct AppState {
     pub ups_client: UpsClient,
     pub access_token: String,
     pub user_store: std::sync::Arc<tokio::sync::RwLock<endpoints::auth::UserStore>>,
+    pub db_pool: Option<sqlx::PgPool>,
 }
 
 pub use models::{
