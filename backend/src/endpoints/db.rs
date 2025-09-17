@@ -1,19 +1,21 @@
-use axum::{extract::State, response::Json};
+use axum::{extract::State, Json};
 use serde::Serialize;
-use crate::AppState;
+use sqlx::{Pool, Postgres};
 
 #[derive(Serialize)]
 pub struct DbHealth {
-    db_ok: bool,
+    pub db_ok: bool,
+}
+
+pub struct AppState {
+    pub db_pool: Pool<Postgres>,
 }
 
 pub async fn db_health(State(app_state): State<AppState>) -> Json<DbHealth> {
-    if let Some(pool) = &app_state.db_pool {
-        let res = sqlx::query_scalar::<_, i64>("SELECT 1")
-            .fetch_one(pool)
-            .await;
-        Json(DbHealth { db_ok: res.is_ok() })
-    } else {
-        Json(DbHealth { db_ok: false })
-    }
+    let db_ok = sqlx::query("SELECT 1")
+        .execute(&app_state.db_pool)
+        .await
+        .is_ok();
+
+    Json(DbHealth { db_ok })
 }
