@@ -9,7 +9,7 @@ use sushi::{AppState, Result as UpsResult, UpsClient, UpsConfig, endpoints, midd
 use tokio::sync::RwLock;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use sqlx::postgres::PgPoolOptions;
+use sqlx::{postgres::PgPoolOptions};
 
 /// SUSHI - UPS Address Validation Tool
 #[derive(Parser, Debug)]
@@ -37,14 +37,12 @@ async fn main() -> UpsResult<()> {
     // Load environment variables from .env file
     dotenv().ok();
 
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set in enviroment");
-
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&database_url)
-        .await
-        .expect("Unable to connect to Postgres");
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let db_pool = PgPoolOptions::new()
+    .max_connections(5)
+    .connect(&database_url)
+    .await
+    .expect("Failed to connect to Postgres");
 
     // Initialize tracing subscriber for structured logging
     tracing_subscriber::registry()
@@ -89,10 +87,10 @@ async fn main() -> UpsResult<()> {
     // Create application state with bootstrap admin
     let user_store = Arc::new(RwLock::new(endpoints::auth::UserStore::new_with_admin()));
     let app_state = AppState {
-        ups_client: client,
-        access_token,
-        user_store,
-        db_pool: Some(pool.clone()),
+    ups_client: client,
+    access_token,
+    user_store,
+    db_pool, 
     };
 
     // Startup axum server with tracing middleware

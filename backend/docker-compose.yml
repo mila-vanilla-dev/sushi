@@ -4,9 +4,9 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: sushi
-      POSTGRES_PASSWORD: sushi_password
-      POSTGRES_DB: sushi_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 100629
+      POSTGRES_DB: sushi
     ports:
       - "5432:5432"
     volumes:

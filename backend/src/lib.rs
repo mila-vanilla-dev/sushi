@@ -18,14 +18,17 @@ pub use client::UpsClient;
 pub use config::UpsConfig;
 pub use error::{Result, UpsError};
 pub use types::{AddressValidationResult, RateRequestOptions, ShippingRateRequest};
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use sqlx::postgres::PgPool;
 
 /// Application state that holds the UPS client and access token
 #[derive(Debug, Clone)]
 pub struct AppState {
     pub ups_client: UpsClient,
     pub access_token: String,
-    pub user_store: std::sync::Arc<tokio::sync::RwLock<endpoints::auth::UserStore>>,
-    pub db_pool: Option<sqlx::PgPool>,
+    pub user_store: Arc<RwLock<endpoints::auth::UserStore>>,
+    pub db_pool: PgPool,
 }
 
 pub use models::{

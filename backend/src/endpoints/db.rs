@@ -1,19 +1,17 @@
+// backend/src/endpoints/db.rs
 use axum::{extract::State, Json};
 use serde::Serialize;
-use sqlx::{Pool, Postgres};
+use crate::AppState; // use the AppState defined in src/lib.rs
 
 #[derive(Serialize)]
 pub struct DbHealth {
     pub db_ok: bool,
 }
 
-pub struct AppState {
-    pub db_pool: Pool<Postgres>,
-}
-
 pub async fn db_health(State(app_state): State<AppState>) -> Json<DbHealth> {
-    let db_ok = sqlx::query("SELECT 1")
-        .execute(&app_state.db_pool)
+    // perform a small runtime query (no compile-time sqlx macros)
+    let db_ok = sqlx::query_scalar::<_, i32>("SELECT 1")
+        .fetch_one(&app_state.db_pool)
         .await
         .is_ok();
 
